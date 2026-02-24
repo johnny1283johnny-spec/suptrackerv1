@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Supplement {
+  id          String      @id @default(cuid())
+  name        String
+  brand       String      @default("")
+  dosageUnit  String      @default("mg")
+  defaultDose Float       @default(1)
+  icon        String      @default("💊")
+  color       String      @default("#10b981")
+  category    String      @default("other")
+  notes       String      @default("")
+  isActive    Boolean     @default(true)
+  order       Int         @default(0)
+  intakeLogs  IntakeLog[]
+  dailyGoals  DailyGoal[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model IntakeLog {
+  id           String     @id @default(cuid())
+  supplementId String
+  supplement   Supplement @relation(fields: [supplementId], references: [id], onDelete: Cascade)
+  dose         Float
+  takenAt      DateTime   @default(now())
+  timeSlot     String     @default("morning")
+  notes        String     @default("")
+  createdAt    DateTime   @default(now())
+}
+
+model DailyGoal {
+  id           String     @id @default(cuid())
+  supplementId String
+  supplement   Supplement @relation(fields: [supplementId], references: [id], onDelete: Cascade)
+  targetDose   Float      @default(1)
+  timeSlot     String     @default("morning")
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
